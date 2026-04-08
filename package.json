@@ -1,0 +1,31 @@
+{
+    "name": "vega2ol",
+    "version": "0.1.0",
+    "description": "Vega expression to Open-Layers expression transpiler",
+    "main": "dist/index.js",
+    "types": "dist/index.d.ts",
+    "type": "module",
+    "files": ["dist"],
+    "scripts": {
+        "build": "tsc",
+        "test": "node dist/tests/test-basic.js",
+        "dev": "tsc --watch"
+    },
+    "keywords": [
+        "vega",
+        "openlayers",
+        "expression",
+        "transpiler",
+        "geospatial"
+    ],
+    "author": "",
+    "license": "BSD-3-Clause",
+    "dependencies": {
+        "vega-expression": "^6.1.0"
+    },
+    "devDependencies": {
+        "@types/node": "^20.19.39",
+        "ts-node": "^10.9.2",
+        "typescript": "^5.9.3"
+    }
+}
