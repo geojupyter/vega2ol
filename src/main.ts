@@ -1,10 +1,10 @@
 import { parseExpression } from "vega-expression";
+import type { ExpressionValue } from "ol/expr/expression.js";
 
 /**
  * OpenLayers expression types
  * OL expressions are arrays: ['operator', arg1, arg2, ...] or ['case', condition, value, ...]
  */
-type OLExpression = any[] | string | number | boolean | null;
 
 /**
  * Vega AST node types (simplified)
@@ -39,6 +39,22 @@ const OPERATOR_MAPPING: Record<string, string> = {
 
   // Other
   "**": "pow",
+};
+
+/**
+* Constants mapping from Vega constants to OpenLayers constants
+*/
+const CONSTANTS_MAPPING: Record<string, number> = {
+  PI: Math.PI,
+  E: Math.E,
+  LN2: Math.LN2,
+  LN10: Math.LN10,
+  LOG2E: Math.LOG2E,
+  LOG10E: Math.LOG10E,
+  SQRT1_2: Math.SQRT1_2,
+  SQRT2: Math.SQRT2,
+  MIN_VALUE: Number.MIN_VALUE,
+  MAX_VALUE: Number.MAX_VALUE,
 };
 
 /**
@@ -96,9 +112,9 @@ export class Vega2OLError extends Error {
  * Visitor class to convert Vega AST to OpenLayers expressions
  */
 class VegaToOLVisitor {
-  private scope: Record<string, OLExpression> = {};
+  private scope: Record<string, ExpressionValue> = {};
 
-  visit(node: VegaNode): OLExpression {
+  visit(node: VegaNode): ExpressionValue {
     if (!node || !node.type) {
       throw new Vega2OLError("Invalid AST node");
     }
@@ -112,10 +128,10 @@ class VegaToOLVisitor {
   }
 
   // Literal values
-  visitLiteral(node: VegaNode): OLExpression {
+  visitLiteral(node: VegaNode): ExpressionValue {
     const { value } = node;
 
-    if (value === null) return null;
+    if (value === null) return null as unknown as ExpressionValue;
     if (typeof value === "boolean") return value;
     if (typeof value === "number") return value;
     if (typeof value === "string") return value;
@@ -124,7 +140,7 @@ class VegaToOLVisitor {
   }
 
   // Member access: datum.value, datum['value']
-  visitMemberExpression(node: VegaNode): OLExpression {
+  visitMemberExpression(node: VegaNode): ExpressionValue {
     const { object, property } = node;
 
     if (object.type === "Identifier" && object.name === "datum") {
@@ -143,7 +159,7 @@ class VegaToOLVisitor {
   }
 
   // Binary operations: a + b, a > b, etc.
-  visitBinaryExpression(node: VegaNode): OLExpression {
+  visitBinaryExpression(node: VegaNode): ExpressionValue {
     const { operator, left, right } = node;
     const leftOL = this.visit(left);
     const rightOL = this.visit(right);
@@ -157,7 +173,7 @@ class VegaToOLVisitor {
   }
 
   // Unary operations: !x, -x, +x
-  visitUnaryExpression(node: VegaNode): OLExpression {
+  visitUnaryExpression(node: VegaNode): ExpressionValue {
     const { operator, argument } = node;
     const argOL = this.visit(argument);
 
@@ -175,7 +191,7 @@ class VegaToOLVisitor {
   }
 
   // Conditional: test ? consequent : alternate
-  visitConditionalExpression(node: VegaNode): OLExpression {
+  visitConditionalExpression(node: VegaNode): ExpressionValue {
     const { test, consequent, alternate } = node;
     const testOL = this.visit(test);
     const consequentOL = this.visit(consequent);
@@ -186,7 +202,7 @@ class VegaToOLVisitor {
   }
 
   // Function calls: floor(x), ceil(y), etc.
-  visitCallExpression(node: VegaNode): OLExpression {
+  visitCallExpression(node: VegaNode): ExpressionValue {
     const { callee, arguments: args } = node;
 
     let funcName: string;
@@ -211,13 +227,13 @@ class VegaToOLVisitor {
   }
 
   // Array literal: [1, 2, 3]
-  visitArrayExpression(node: VegaNode): OLExpression {
+  visitArrayExpression(node: VegaNode): ExpressionValue {
     const { elements } = node;
     return elements.map((elem: VegaNode) => this.visit(elem));
   }
 
   // Logical expressions
-  visitLogicalExpression(node: VegaNode): OLExpression {
+  visitLogicalExpression(node: VegaNode): ExpressionValue {
     const { operator, left, right } = node;
 
     const leftOL = this.visit(left);
@@ -232,7 +248,7 @@ class VegaToOLVisitor {
   }
 
   // Identifier/Variable: x, PI, etc.
-  visitIdentifier(node: VegaNode): OLExpression {
+  visitIdentifier(node: VegaNode): ExpressionValue {
     const { name } = node;
 
     // Check if it's in the current scope
@@ -240,22 +256,8 @@ class VegaToOLVisitor {
       return this.scope[name];
     }
 
-    // Vega constants
-    const vegaConstants: Record<string, number> = {
-      PI: Math.PI,
-      E: Math.E,
-      LN2: Math.LN2,
-      LN10: Math.LN10,
-      LOG2E: Math.LOG2E,
-      LOG10E: Math.LOG10E,
-      SQRT1_2: Math.SQRT1_2,
-      SQRT2: Math.SQRT2,
-      MIN_VALUE: Number.MIN_VALUE,
-      MAX_VALUE: Number.MAX_VALUE,
-    };
-
-    if (name in vegaConstants) {
-      return vegaConstants[name];
+    if (name in CONSTANTS_MAPPING) {
+      return CONSTANTS_MAPPING[name];
     }
 
     // Return as string (might be a function or field)
@@ -270,13 +272,12 @@ class VegaToOLVisitor {
  */
 export async function vega2ol(
   vegaExpressionStr: string
-): Promise<OLExpression> {
+): Promise<ExpressionValue> {
   if (typeof vegaExpressionStr !== "string") {
     throw new Vega2OLError("Input must be a string");
   }
 
   try {
-
     // Parse Vega expression to AST
     const ast = parseExpression(vegaExpressionStr);
 
@@ -295,4 +296,4 @@ export async function vega2ol(
   }
 }
 
-export { OLExpression, VegaNode };
+export { ExpressionValue as OLExpression, VegaNode };

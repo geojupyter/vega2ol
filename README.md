@@ -152,4 +152,3 @@ const olExpr = vega2ol(vegaExpr);
 - [Vega Expression Documentation](https://vega.github.io/vega/docs/expressions/)
 - [Vega Expression Parser](https://github.com/vega/vega/tree/main/packages/vega-expression)
 - [OpenLayers Documentation](https://openlayers.org/)
-- [OpenLayers Expressions](https://openlayers.org/doc/tutorials/expressions.html)

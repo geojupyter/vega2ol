@@ -5,7 +5,9 @@
     "main": "dist/index.js",
     "types": "dist/index.d.ts",
     "type": "module",
-    "files": ["dist"],
+    "files": [
+        "dist"
+    ],
     "scripts": {
         "build": "tsc",
         "test": "node dist/tests/test-basic.js",
@@ -25,6 +27,7 @@
     },
     "devDependencies": {
         "@types/node": "^20.19.39",
+        "ol": "^9.2.4",
         "ts-node": "^10.9.2",
         "typescript": "^5.9.3"
     }
