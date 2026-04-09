@@ -42,8 +42,8 @@ const OPERATOR_MAPPING: Record<string, string> = {
 };
 
 /**
-* Constants mapping from Vega constants to OpenLayers constants
-*/
+ * Constants mapping from Vega constants to OpenLayers constants
+ */
 const CONSTANTS_MAPPING: Record<string, number> = {
   PI: Math.PI,
   E: Math.E,
@@ -270,9 +270,7 @@ class VegaToOLVisitor {
  * @param vegaExpressionStr - A Vega expression string (e.g., "datum.value > 100 ? 'red' : 'blue'")
  * @returns OpenLayers expression array
  */
-export async function vega2ol(
-  vegaExpressionStr: string
-): Promise<ExpressionValue> {
+export function vega2ol(vegaExpressionStr: string): ExpressionValue {
   if (typeof vegaExpressionStr !== "string") {
     throw new Vega2OLError("Input must be a string");
   }
