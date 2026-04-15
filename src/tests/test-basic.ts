@@ -1,4 +1,4 @@
-import { vega2ol, Vega2OLError } from "../src/main.js";
+import { vega2ol, Vega2OLError } from "../main.js";
 
 // Simple assertion helper
 function assertEqual(actual: any, expected: any, message: string) {
