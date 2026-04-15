@@ -6,13 +6,13 @@
       "lib": ["DOM"],
       "declaration": true,
       "outDir": "./dist",
-      "rootDir": ".",
+      "rootDir": "src",
       "strict": true,
       "skipLibCheck": true,
       "forceConsistentCasingInFileNames": true,
       "resolveJsonModule": true,
       "moduleResolution": "NodeNext"
     },
-    "include": ["src/**/*", "tests/**/*.ts"],
+    "include": ["src/**/*"],
     "exclude": ["node_modules", "dist"]
   }
