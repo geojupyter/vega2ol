@@ -114,6 +114,25 @@ export class Vega2OLError extends Error {
 class VegaToOLVisitor {
   private scope: Record<string, ExpressionValue> = {};
 
+  private isNegativeOne(node: VegaNode): boolean {
+    // Case 1: Literal -1
+    if (node.type === "Literal" && node.value === -1) {
+      return true;
+    }
+
+    // Case 2: UnaryExpression: -1
+    if (
+      node.type === "UnaryExpression" &&
+      node.operator === "-" &&
+      node.argument?.type === "Literal" &&
+      node.argument.value === 1
+    ) {
+      return true;
+    }
+
+    return false;
+  }
+
   visit(node: VegaNode): ExpressionValue {
     if (!node || !node.type) {
       throw new Vega2OLError("Invalid AST node");
@@ -158,11 +177,51 @@ class VegaToOLVisitor {
     throw new Vega2OLError(`Unsupported member access`);
   }
 
+  isIndexOfCall(node: VegaNode): boolean {
+    return (
+      node.type === "CallExpression" &&
+      node.callee?.type === "Identifier" &&
+      node.callee.name.toLowerCase() === "indexof"
+    );
+  }
+
   // Binary operations: a + b, a > b, etc.
   visitBinaryExpression(node: VegaNode): ExpressionValue {
     const { operator, left, right } = node;
     const leftOL = this.visit(left);
     const rightOL = this.visit(right);
+
+    // Special handling for indexOf comparisons
+    if (operator === "!=" || operator === "==") {
+      let call: VegaNode | null = null;
+
+      if (this.isIndexOfCall(left) && this.isNegativeOne(right)) {
+        call = left as VegaNode;
+      } else if (this.isIndexOfCall(right) && this.isNegativeOne(left)) {
+        call = right as VegaNode;
+      }
+
+      if (call) {
+        const [arrayArg, valueArg] = call.arguments || [];
+
+        if (arrayArg && valueArg) {
+          const arrayOL = this.visit(arrayArg);
+          const valueOL = this.visit(valueArg);
+
+          const inExpr: ExpressionValue = ["in", valueOL, arrayOL];
+
+          // indexof(...) != -1 → is in
+          if (operator === "!=") {
+            return inExpr;
+          }
+
+          // indexof(...) == -1 → is NOT in
+          if (operator === "==") {
+            return ["!", inExpr];
+          }
+        }
+      }
+    }
 
     const olOp = OPERATOR_MAPPING[operator];
     if (!olOp) {
