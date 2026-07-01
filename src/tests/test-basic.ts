@@ -242,6 +242,16 @@ async function runTests() {
 
     if (
       assertEqual(
+        await vega2ol("-1 != indexof(['USA', 'India'], datum.country)"),
+        ["in", ["get", "country"], ["USA", "India"]],
+        "reverse indexOf with != -1 (is in)"
+      )
+    )
+      passed++;
+    else failed++;
+
+    if (
+      assertEqual(
         await vega2ol(
           "indexof(['hot', 'warm'], datum.temperature) != -1 ? 'red' : 'blue'"
         ),
@@ -261,7 +271,17 @@ async function runTests() {
       assertEqual(
         await vega2ol("indexof(['USA', 'India'], datum.country) == -1"),
         ["!", ["in", ["get", "country"], ["USA", "India"]]],
-        "indexOf with == -1 (not in)"
+        "indexOf with == -1 (is not in)"
+      )
+    )
+      passed++;
+    else failed++;
+
+    if (
+      assertEqual(
+        await vega2ol("-1 == indexof(['USA', 'India'], datum.country)"),
+        ["!", ["in", ["get", "country"], ["USA", "India"]]],
+        "reverse indexOf with == -1 (is not in)"
       )
     )
       passed++;

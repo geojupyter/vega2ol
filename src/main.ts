@@ -130,20 +130,6 @@ class VegaToOLVisitor {
       return true;
     }
 
-    // Case 3: BinaryExpression like (* 1 -1)
-    if (
-      node.type === "BinaryExpression" &&
-      node.operator === "*" &&
-      (
-        (node.left?.type === "Literal" && node.left.value === 1 &&
-         node.right?.type === "Literal" && node.right.value === -1) ||
-        (node.right?.type === "Literal" && node.right.value === 1 &&
-         node.left?.type === "Literal" && node.left.value === -1)
-      )
-    ) {
-      return true;
-    }
-
     return false;
   }
 
@@ -191,6 +177,14 @@ class VegaToOLVisitor {
     throw new Vega2OLError(`Unsupported member access`);
   }
 
+  isIndexOfCall(node: VegaNode): boolean {
+    return (
+      node.type === "CallExpression" &&
+      node.callee?.type === "Identifier" &&
+      node.callee.name.toLowerCase() === "indexof"
+    );
+  }
+
   // Binary operations: a + b, a > b, etc.
   visitBinaryExpression(node: VegaNode): ExpressionValue {
     const { operator, left, right } = node;
@@ -198,31 +192,32 @@ class VegaToOLVisitor {
     const rightOL = this.visit(right);
 
     // Special handling for indexOf comparisons
-    if (
-      (operator === "!=" || operator === "==") &&
-      this.isNegativeOne(right)
-    ) {
-      if (left.type === "CallExpression") {
-        const call = left as VegaNode;
-        if (
-          call.callee?.type === "Identifier" &&
-          call.callee.name.toLowerCase() === "indexof"
-        ) {
-          const [arrayArg, valueArg] = call.arguments || [];
-          if (arrayArg && valueArg) {
-            const arrayOL = this.visit(arrayArg);
-            const valueOL = this.visit(valueArg);
+    if (operator === "!=" || operator === "==") {
+      let call: VegaNode | null = null;
 
-            const inExpr: ExpressionValue = ["in", valueOL, arrayOL];
+      if (this.isIndexOfCall(left) && this.isNegativeOne(right)) {
+        call = left as VegaNode;
+      } else if (this.isIndexOfCall(right) && this.isNegativeOne(left)) {
+        call = right as VegaNode;
+      }
 
-            // indexof(...) != -1 means "is in"
-            if (operator === "!=") {
-              return inExpr;
-            }
-            // indexof(...) == -1 means "is not in"
-            if (operator === "==") {
-              return ["!", inExpr];
-            }
+      if (call) {
+        const [arrayArg, valueArg] = call.arguments || [];
+
+        if (arrayArg && valueArg) {
+          const arrayOL = this.visit(arrayArg);
+          const valueOL = this.visit(valueArg);
+
+          const inExpr: ExpressionValue = ["in", valueOL, arrayOL];
+
+          // indexof(...) != -1 → is in
+          if (operator === "!=") {
+            return inExpr;
+          }
+
+          // indexof(...) == -1 → is NOT in
+          if (operator === "==") {
+            return ["!", inExpr];
           }
         }
       }
