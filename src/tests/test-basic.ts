@@ -228,7 +228,46 @@ async function runTests() {
     if (assertEqual(await vega2ol("PI"), Math.PI, "PI constant")) passed++;
     else failed++;
 
-    // Test 13: Error handling
+    // Test 13: Binary expressions
+    console.log("\n📋 Binary Expressions");
+    if (
+      assertEqual(
+        await vega2ol("indexof(['USA', 'India'], datum.country) != -1"),
+        ["in", ["get", "country"], ["USA", "India"]],
+        "indexOf with != -1 (is in)"
+      )
+    )
+      passed++;
+    else failed++;
+
+    if (
+      assertEqual(
+        await vega2ol(
+          "indexof(['hot', 'warm'], datum.temperature) != -1 ? 'red' : 'blue'"
+        ),
+        [
+          "case",
+          ["in", ["get", "temperature"], ["hot", "warm"]],
+          "red",
+          "blue",
+        ],
+        "indexOf in ternary (if in)"
+      )
+    )
+      passed++;
+    else failed++;
+
+    if (
+      assertEqual(
+        await vega2ol("indexof(['USA', 'India'], datum.country) == -1"),
+        ["!", ["in", ["get", "country"], ["USA", "India"]]],
+        "indexOf with == -1 (not in)"
+      )
+    )
+      passed++;
+    else failed++;
+
+    // Test 14: Error handling
     console.log("\n📋 Error Handling");
     try {
       await vega2ol(null as any);

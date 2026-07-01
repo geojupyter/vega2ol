@@ -31,7 +31,8 @@
     "scripts": {
         "build": "tsc",
         "test": "node dist/tests/test-basic.js",
-        "dev": "tsc --watch"
+        "dev": "tsc --watch",
+        "clean": "rm -rf dist"
     },
     "dependencies": {
         "vega-expression": "^6.1.0"
