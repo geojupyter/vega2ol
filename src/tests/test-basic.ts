@@ -187,9 +187,99 @@ async function runTests() {
 
     if (
       assertEqual(
+        await vega2ol("ceil(datum.value)"),
+        ["ceil", ["get", "value"]],
+        "ceil()"
+      )
+    )
+      passed++;
+    else failed++;
+
+    if (
+      assertEqual(
+        await vega2ol("round(datum.value)"),
+        ["round", ["get", "value"]],
+        "round()"
+      )
+    )
+      passed++;
+    else failed++;
+
+    if (
+      assertEqual(
+        await vega2ol("abs(datum.value)"),
+        ["abs", ["get", "value"]],
+        "abs()"
+      )
+    )
+      passed++;
+    else failed++;
+
+    if (
+      assertEqual(
+        await vega2ol("sqrt(datum.value)"),
+        ["sqrt", ["get", "value"]],
+        "sqrt()"
+      )
+    )
+      passed++;
+    else failed++;
+
+    if (
+      assertEqual(
+        await vega2ol("sin(datum.value)"),
+        ["sin", ["get", "value"]],
+        "sin()"
+      )
+    )
+      passed++;
+    else failed++;
+
+    if (
+      assertEqual(
+        await vega2ol("cos(datum.value)"),
+        ["cos", ["get", "value"]],
+        "cos()"
+      )
+    )
+      passed++;
+    else failed++;
+
+    if (
+      assertEqual(
         await vega2ol("pow(datum.base, 2)"),
-        ["pow", ["get", "base"], 2],
-        "Pow function with multiple args"
+        ["^", ["get", "base"], 2],
+        "pow() maps to OL's '^' operator, not a 'pow' function"
+      )
+    )
+      passed++;
+    else failed++;
+
+    if (
+      assertEqual(
+        await vega2ol("atan(datum.value)"),
+        ["atan", ["get", "value"]],
+        "atan() single-arg form"
+      )
+    )
+      passed++;
+    else failed++;
+
+    if (
+      assertEqual(
+        await vega2ol("atan2(datum.x, datum.y)"),
+        ["atan", ["get", "x"], ["get", "y"]],
+        "atan2() two-arg form"
+      )
+    )
+      passed++;
+    else failed++;
+
+    if (
+      assertEqual(
+        await vega2ol("clamp(datum.value, 0, 100)"),
+        ["clamp", ["get", "value"], 0, 100],
+        "clamp() preserves (value, min, max) arg order"
       )
     )
       passed++;
