@@ -16,6 +16,40 @@ function assertEqual(actual: any, expected: any, message: string) {
   }
 }
 
+// Assert that vega2ol throws a Vega2OLError for the given expression
+async function assertThrows(
+  expr: string,
+  message: string,
+  messageContains?: string
+) {
+  try {
+    const result = await vega2ol(expr);
+    console.log(`   ❌ ${message}`);
+    console.log(
+      `   Expected a Vega2OLError, but got result: ${JSON.stringify(result)}`
+    );
+    return false;
+  } catch (error) {
+    if (!(error instanceof Vega2OLError)) {
+      console.log(`   ❌ ${message}`);
+      console.log(
+        `   Expected Vega2OLError, got: ${(error as Error).constructor.name}: ${
+          (error as Error).message
+        }`
+      );
+      return false;
+    }
+    if (messageContains && !error.message.includes(messageContains)) {
+      console.log(`   ❌ ${message}`);
+      console.log(`   Error message did not contain "${messageContains}"`);
+      console.log(`   Got message: ${error.message}`);
+      return false;
+    }
+    console.log(`   ✅ ${message}`);
+    return true;
+  }
+}
+
 // Run tests
 async function runTests() {
   console.log("🚀 Testing vega2ol transpiler\n");
@@ -377,7 +411,132 @@ async function runTests() {
       passed++;
     else failed++;
 
-    // Test 14: Error handling
+    // Test 14: Unsupported / unknown function errors
+    console.log("\n📋 Errors: Vega Functions With No OL Equivalent");
+
+    if (
+      await assertThrows(
+        "upper(datum.name)",
+        "upper() throws (no OL string case operator)",
+        "Unsupported function"
+      )
+    )
+      passed++;
+    else failed++;
+
+    if (
+      await assertThrows(
+        "lower(datum.name)",
+        "lower() throws (no OL string case operator)",
+        "Unsupported function"
+      )
+    )
+      passed++;
+    else failed++;
+
+    if (
+      await assertThrows(
+        "toString(datum.value)",
+        "toString() throws (no OL type coercion operator)",
+        "Unsupported function"
+      )
+    )
+      passed++;
+    else failed++;
+
+    if (
+      await assertThrows(
+        "isValid(datum.value)",
+        "isValid() throws (no OL type-checking operator)",
+        "Unsupported function"
+      )
+    )
+      passed++;
+    else failed++;
+
+    if (
+      await assertThrows(
+        "length(datum.items)",
+        "length() throws (no OL length operator)",
+        "Unsupported function"
+      )
+    )
+      passed++;
+    else failed++;
+
+    if (
+      await assertThrows(
+        "format(datum.value, ',.2f')",
+        "format() throws (no OL number-formatting operator)",
+        "Unsupported function"
+      )
+    )
+      passed++;
+    else failed++;
+
+    if (
+      await assertThrows(
+        "now()",
+        "now() throws (no OL date/time operators)",
+        "Unsupported function"
+      )
+    )
+      passed++;
+    else failed++;
+
+    if (
+      await assertThrows(
+        "min(datum.a, datum.b)",
+        "min() throws (no OL aggregate min/max operator)",
+        "Unsupported function"
+      )
+    )
+      passed++;
+    else failed++;
+
+    if (
+      await assertThrows(
+        "tan(datum.value)",
+        "tan() throws (OL only supports sin/cos/atan)",
+        "Unsupported function"
+      )
+    )
+      passed++;
+    else failed++;
+
+    if (
+      await assertThrows(
+        "indexof(datum.items, 'x')",
+        "bare indexof() outside the != -1 / == -1 pattern throws a specific error",
+        "indexof is only supported in the pattern"
+      )
+    )
+      passed++;
+    else failed++;
+
+    console.log("\n📋 Errors: Names That Don't Exist In Vega Or OL");
+
+    if (
+      await assertThrows(
+        "totallyMadeUpFunction(datum.value)",
+        "Nonexistent function name throws",
+        "Unsupported function"
+      )
+    )
+      passed++;
+    else failed++;
+
+    if (
+      await assertThrows(
+        "fooBarBaz(1, 2, 3)",
+        "Another nonexistent function name throws",
+        "Unsupported function"
+      )
+    )
+      passed++;
+    else failed++;
+
+    // Test 15: Error handling
     console.log("\n📋 Error Handling");
     try {
       await vega2ol(null as any);
