@@ -36,9 +36,6 @@ const OPERATOR_MAPPING: Record<string, string> = {
   "*": "*",
   "/": "/",
   "%": "%",
-
-  // Other
-  "**": "pow",
 };
 
 /**
@@ -67,34 +64,12 @@ const FUNCTION_MAPPING: Record<string, string> = {
   ceil: "ceil",
   round: "round",
   sqrt: "sqrt",
-  pow: "pow",
-  log: "log",
-  exp: "exp",
+  pow: "^",
   sin: "sin",
   cos: "cos",
-  tan: "tan",
-
-  // String functions
-  tostring: "toString",
-  upper: "toUpperCase",
-  lower: "toLowerCase",
-  substring: "substring",
-
-  // Array functions
-  length: "length",
-  indexof: "indexOf",
-  slice: "slice",
-
-  // Type functions
-  type: "type",
-  isvalid: "isValid",
-  isnumber: "isNumber",
-  isstring: "isString",
-  isboolean: "isBoolean",
-
-  // Aggregation functions
-  min: "min",
-  max: "max",
+  atan: "atan",
+  atan2: "atan",
+  clamp: "clamp",
 };
 
 /**
@@ -188,8 +163,6 @@ class VegaToOLVisitor {
   // Binary operations: a + b, a > b, etc.
   visitBinaryExpression(node: VegaNode): ExpressionValue {
     const { operator, left, right } = node;
-    const leftOL = this.visit(left);
-    const rightOL = this.visit(right);
 
     // Special handling for indexOf comparisons
     if (operator === "!=" || operator === "==") {
@@ -222,6 +195,9 @@ class VegaToOLVisitor {
         }
       }
     }
+
+    const leftOL = this.visit(left);
+    const rightOL = this.visit(right);
 
     const olOp = OPERATOR_MAPPING[operator];
     if (!olOp) {
@@ -274,6 +250,13 @@ class VegaToOLVisitor {
       funcName = callee.property;
     } else {
       throw new Vega2OLError(`Unsupported function call`);
+    }
+
+    if (this.isIndexOfCall(node)) {
+      throw new Vega2OLError(
+        `indexof is only supported in the pattern 'indexof(array, value) != -1' (or '== -1'), ` +
+          `it cannot be used as a standalone expression in OpenLayers`
+      );
     }
 
     const olFunc = FUNCTION_MAPPING[funcName.toLowerCase()];
