@@ -181,7 +181,11 @@ class VegaToOLVisitor {
           const arrayOL = this.visit(arrayArg);
           const valueOL = this.visit(valueArg);
 
-          const inExpr: ExpressionValue = ["in", valueOL, arrayOL];
+          const inExpr: ExpressionValue = [
+            "in",
+            valueOL,
+            ["literal", arrayOL] as ExpressionValue,
+          ];
 
           // indexof(...) != -1 → is in
           if (operator === "!=") {
