@@ -70,6 +70,7 @@ const FUNCTION_MAPPING: Record<string, string> = {
   atan: "atan",
   atan2: "atan",
   clamp: "clamp",
+  rgb: "rgb",
 };
 
 /**
@@ -261,6 +262,15 @@ class VegaToOLVisitor {
         `indexof is only supported in the pattern 'indexof(array, value) != -1' (or '== -1'), ` +
           `it cannot be used as a standalone expression in OpenLayers`
       );
+    }
+
+    // rgb(r, g, b[, opacity]) → OL ['color', r, g, b, a].
+    if (
+      funcName.toLowerCase() === "rgb" &&
+      (args.length === 3 || args.length === 4)
+    ) {
+      const [r, g, b, a] = args.map((arg: VegaNode) => this.visit(arg));
+      return ["color", r, g, b, a ?? 1] as ExpressionValue;
     }
 
     const olFunc = FUNCTION_MAPPING[funcName.toLowerCase()];
