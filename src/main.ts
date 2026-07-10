@@ -269,8 +269,14 @@ class VegaToOLVisitor {
       funcName.toLowerCase() === "rgb" &&
       (args.length === 3 || args.length === 4)
     ) {
-      const [r, g, b, a] = args.map((arg: VegaNode) => this.visit(arg));
-      return ["color", r, g, b, a ?? 1] as ExpressionValue;
+      const [r, g, b, a] = args;
+      return [
+        "color",
+        this.visit(r),
+        this.visit(g),
+        this.visit(b),
+        a ? this.visit(a) : 1,
+      ] as ExpressionValue;
     }
 
     const olFunc = FUNCTION_MAPPING[funcName.toLowerCase()];
