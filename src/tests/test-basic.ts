@@ -319,6 +319,46 @@ async function runTests() {
       passed++;
     else failed++;
 
+    if (
+      assertEqual(
+        await vega2ol("rgb(255, 0, 0)"),
+        ["color", 255, 0, 0, 1],
+        "rgb() with 3 numeric literals, default opacity"
+      )
+    )
+      passed++;
+    else failed++;
+
+    if (
+      assertEqual(
+        await vega2ol("rgb(255, 0, 0, 0.5)"),
+        ["color", 255, 0, 0, 0.5],
+        "rgb() with explicit opacity"
+      )
+    )
+      passed++;
+    else failed++;
+
+    if (
+      assertEqual(
+        await vega2ol("rgb(datum.r, datum.g, datum.b)"),
+        ["color", ["get", "r"], ["get", "g"], ["get", "b"], 1],
+        "rgb() with dynamic field args, default opacity"
+      )
+    )
+      passed++;
+    else failed++;
+
+    if (
+      assertEqual(
+        await vega2ol("rgb(sqrt(50), 0, 0, 0.5)"),
+        ["color", ["sqrt", 50], 0, 0, 0.5],
+        "rgb() with nested function call as a channel arg"
+      )
+    )
+      passed++;
+    else failed++;
+
     // Test 10: Real-world example - Color mapping
     console.log("\n📋 Real-world Examples");
     if (
