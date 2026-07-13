@@ -17,7 +17,7 @@ interface VegaNode {
 /**
  * Operator mapping from Vega operators to OpenLayers operators
  */
-const OPERATOR_MAPPING: Record<string, string> = {
+export const OPERATOR_MAPPING: Record<string, string> = {
   // Comparison operators
   "==": "==",
   "!=": "!=",
@@ -41,7 +41,7 @@ const OPERATOR_MAPPING: Record<string, string> = {
 /**
  * Constants mapping from Vega constants to OpenLayers constants
  */
-const CONSTANTS_MAPPING: Record<string, number> = {
+export const CONSTANTS_MAPPING: Record<string, number> = {
   PI: Math.PI,
   E: Math.E,
   LN2: Math.LN2,
@@ -57,7 +57,7 @@ const CONSTANTS_MAPPING: Record<string, number> = {
 /**
  * Function mapping from Vega functions to OpenLayers functions
  */
-const FUNCTION_MAPPING: Record<string, string> = {
+export const FUNCTION_MAPPING: Record<string, string> = {
   // Math functions
   abs: "abs",
   floor: "floor",
