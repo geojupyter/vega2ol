@@ -45,7 +45,10 @@ const style = {
 - Numbers: `42`, `3.14`, `-10`
 - Strings: `'hello'`, `"world"`
 - Booleans: `true`, `false`
-- Null: `null`
+
+#### Limitations
+- Null literals are not supported because OpenLayers expressions do not accept `null` values.
+- Comparisons against `null` (`== null`, `!= null`) are unsupported.
 
 ### Member Access
 - `datum.fieldName` → `['get', 'fieldName']`

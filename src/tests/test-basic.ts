@@ -451,6 +451,47 @@ async function runTests() {
       passed++;
     else failed++;
 
+    if (
+      assertEqual(
+        await vega2ol('"id-" + datum.name'),
+        ["concat", "id-", ["get", "name"]],
+        "string + property (concatenation)"
+      )
+    )
+      passed++;
+    else failed++;
+
+    if (
+      assertEqual(
+        await vega2ol('datum.name + "-id"'),
+        ["concat", ["get", "name"], "-id"],
+        "property + string (concatenation)"
+      )
+    )
+      passed++;
+    else failed++;
+
+    // Numeric addition should remain unchanged
+    if (
+      assertEqual(
+        await vega2ol("10 + 20"),
+        ["+", 10, 20],
+        "numeric addition"
+      )
+    )
+      passed++;
+    else failed++;
+
+    if (
+      assertEqual(
+        await vega2ol("datum.value + 10"),
+        ["+", ["get", "value"], 10],
+        "property + number (numeric addition)"
+      )
+    )
+      passed++;
+    else failed++;
+
     // Test 14: Unsupported / unknown function errors
     console.log("\n📋 Errors: Vega Functions With No OL Equivalent");
 
@@ -588,6 +629,21 @@ async function runTests() {
         passed++;
       } else {
         console.log("❌ Wrong error type");
+        failed++;
+      }
+    }
+
+    // Null literal
+    try {
+      await vega2ol("null");
+      console.log("❌ Should throw for null literal");
+      failed++;
+    } catch (error) {
+      if (error instanceof Vega2OLError) {
+        console.log("   ✅ Throws Vega2OLError for null literal");
+        passed++;
+      } else {
+        console.log("❌ Wrong error type for null literal");
         failed++;
       }
     }

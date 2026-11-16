@@ -126,7 +126,12 @@ class VegaToOLVisitor {
   visitLiteral(node: VegaNode): ExpressionValue {
     const { value } = node;
 
-    if (value === null) return null as unknown as ExpressionValue;
+    if (value === null) {
+      throw new Vega2OLError(
+        `Null literals are not supported in OpenLayers expressions`,
+      );
+    }
+
     if (typeof value === "boolean") return value;
     if (typeof value === "number") return value;
     if (typeof value === "string") return value;
@@ -204,6 +209,14 @@ class VegaToOLVisitor {
     const leftOL = this.visit(left);
     const rightOL = this.visit(right);
 
+    // String Concatination: a + b where either a or b is a string
+    if (
+      operator === "+" &&
+      (typeof leftOL === "string" || typeof rightOL === "string")
+    ) {
+      return ["concat", leftOL, rightOL];
+    }
+
     const olOp = OPERATOR_MAPPING[operator];
     if (!olOp) {
       throw new Vega2OLError(`Unsupported binary operator: ${operator}`);
@@ -260,7 +273,7 @@ class VegaToOLVisitor {
     if (this.isIndexOfCall(node)) {
       throw new Vega2OLError(
         `indexof is only supported in the pattern 'indexof(array, value) != -1' (or '== -1'), ` +
-          `it cannot be used as a standalone expression in OpenLayers`
+          `it cannot be used as a standalone expression in OpenLayers`,
       );
     }
 
@@ -351,7 +364,7 @@ export function vega2ol(vegaExpressionStr: string): ExpressionValue {
       throw error;
     }
     throw new Vega2OLError(
-      `Failed to parse expression: ${(error as Error).message}`
+      `Failed to parse expression: ${(error as Error).message}`,
     );
   }
 }
