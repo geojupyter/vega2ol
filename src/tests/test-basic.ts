@@ -463,6 +463,16 @@ async function runTests() {
 
     if (
       assertEqual(
+        await vega2ol('"id-" + datum.name + "-suffix"'),
+        ["concat", ["concat", "id-", ["get", "name"]], "-suffix"],
+        "multiple string concatenations",
+      )
+    )
+      passed++;
+    else failed++;
+
+    if (
+      assertEqual(
         await vega2ol('datum.name + "-id"'),
         ["concat", ["get", "name"], "-id"],
         "property + string (concatenation)",
@@ -473,7 +483,11 @@ async function runTests() {
 
     // Numeric addition should remain unchanged
     if (
-      assertEqual(await vega2ol("10 + 20"), ["+", 10, 20], "numeric addition")
+      assertEqual(
+        await vega2ol("10 + 20 + 30"),
+        ["+", ["+", 10, 20], 30],
+        "multiple numeric addition",
+      )
     )
       passed++;
     else failed++;
