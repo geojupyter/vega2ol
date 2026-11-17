@@ -20,13 +20,13 @@ function assertEqual(actual: any, expected: any, message: string) {
 async function assertThrows(
   expr: string,
   message: string,
-  messageContains?: string
+  messageContains?: string,
 ) {
   try {
     const result = await vega2ol(expr);
     console.log(`   ❌ ${message}`);
     console.log(
-      `   Expected a Vega2OLError, but got result: ${JSON.stringify(result)}`
+      `   Expected a Vega2OLError, but got result: ${JSON.stringify(result)}`,
     );
     return false;
   } catch (error) {
@@ -35,7 +35,7 @@ async function assertThrows(
       console.log(
         `   Expected Vega2OLError, got: ${(error as Error).constructor.name}: ${
           (error as Error).message
-        }`
+        }`,
       );
       return false;
     }
@@ -74,7 +74,7 @@ async function runTests() {
       assertEqual(
         await vega2ol("datum.value"),
         ["get", "value"],
-        "Simple datum access"
+        "Simple datum access",
       )
     )
       passed++;
@@ -83,7 +83,7 @@ async function runTests() {
       assertEqual(
         await vega2ol("datum.population"),
         ["get", "population"],
-        "Datum field access"
+        "Datum field access",
       )
     )
       passed++;
@@ -95,7 +95,7 @@ async function runTests() {
       assertEqual(
         await vega2ol("datum.value > 100"),
         [">", ["get", "value"], 100],
-        "Greater than operator"
+        "Greater than operator",
       )
     )
       passed++;
@@ -105,7 +105,7 @@ async function runTests() {
       assertEqual(
         await vega2ol("datum.value == 100"),
         ["==", ["get", "value"], 100],
-        "Equality operator"
+        "Equality operator",
       )
     )
       passed++;
@@ -117,7 +117,7 @@ async function runTests() {
       assertEqual(
         await vega2ol("datum.value > 100 ? 'red' : 'blue'"),
         ["case", [">", ["get", "value"], 100], "red", "blue"],
-        "Simple ternary expression"
+        "Simple ternary expression",
       )
     )
       passed++;
@@ -127,7 +127,7 @@ async function runTests() {
     if (
       assertEqual(
         await vega2ol(
-          "datum.value > 100 ? 'red' : datum.value > 50 ? 'yellow' : 'green'"
+          "datum.value > 100 ? 'red' : datum.value > 50 ? 'yellow' : 'green'",
         ),
         [
           "case",
@@ -135,7 +135,7 @@ async function runTests() {
           "red",
           ["case", [">", ["get", "value"], 50], "yellow", "green"],
         ],
-        "Nested ternary expression"
+        "Nested ternary expression",
       )
     )
       passed++;
@@ -147,7 +147,7 @@ async function runTests() {
       assertEqual(
         await vega2ol("datum.x > 0 && datum.y < 100"),
         ["all", [">", ["get", "x"], 0], ["<", ["get", "y"], 100]],
-        "AND operator"
+        "AND operator",
       )
     )
       passed++;
@@ -157,7 +157,7 @@ async function runTests() {
       assertEqual(
         await vega2ol("datum.a > 1 || datum.b < 5"),
         ["any", [">", ["get", "a"], 1], ["<", ["get", "b"], 5]],
-        "OR operator"
+        "OR operator",
       )
     )
       passed++;
@@ -169,7 +169,7 @@ async function runTests() {
       assertEqual(
         await vega2ol("datum.a + datum.b"),
         ["+", ["get", "a"], ["get", "b"]],
-        "Addition operator"
+        "Addition operator",
       )
     )
       passed++;
@@ -179,7 +179,7 @@ async function runTests() {
       assertEqual(
         await vega2ol("datum.a * datum.b"),
         ["*", ["get", "a"], ["get", "b"]],
-        "Multiplication operator"
+        "Multiplication operator",
       )
     )
       passed++;
@@ -191,7 +191,7 @@ async function runTests() {
       assertEqual(
         await vega2ol("!datum.active"),
         ["!", ["get", "active"]],
-        "Negation operator"
+        "Negation operator",
       )
     )
       passed++;
@@ -201,7 +201,7 @@ async function runTests() {
       assertEqual(
         await vega2ol("-datum.value"),
         ["*", ["get", "value"], -1],
-        "Unary minus"
+        "Unary minus",
       )
     )
       passed++;
@@ -213,7 +213,7 @@ async function runTests() {
       assertEqual(
         await vega2ol("floor(datum.value)"),
         ["floor", ["get", "value"]],
-        "Floor function"
+        "Floor function",
       )
     )
       passed++;
@@ -223,7 +223,7 @@ async function runTests() {
       assertEqual(
         await vega2ol("ceil(datum.value)"),
         ["ceil", ["get", "value"]],
-        "ceil()"
+        "ceil()",
       )
     )
       passed++;
@@ -233,7 +233,7 @@ async function runTests() {
       assertEqual(
         await vega2ol("round(datum.value)"),
         ["round", ["get", "value"]],
-        "round()"
+        "round()",
       )
     )
       passed++;
@@ -243,7 +243,7 @@ async function runTests() {
       assertEqual(
         await vega2ol("abs(datum.value)"),
         ["abs", ["get", "value"]],
-        "abs()"
+        "abs()",
       )
     )
       passed++;
@@ -253,7 +253,7 @@ async function runTests() {
       assertEqual(
         await vega2ol("sqrt(datum.value)"),
         ["sqrt", ["get", "value"]],
-        "sqrt()"
+        "sqrt()",
       )
     )
       passed++;
@@ -263,7 +263,7 @@ async function runTests() {
       assertEqual(
         await vega2ol("sin(datum.value)"),
         ["sin", ["get", "value"]],
-        "sin()"
+        "sin()",
       )
     )
       passed++;
@@ -273,7 +273,7 @@ async function runTests() {
       assertEqual(
         await vega2ol("cos(datum.value)"),
         ["cos", ["get", "value"]],
-        "cos()"
+        "cos()",
       )
     )
       passed++;
@@ -283,7 +283,7 @@ async function runTests() {
       assertEqual(
         await vega2ol("pow(datum.base, 2)"),
         ["^", ["get", "base"], 2],
-        "pow() maps to OL's '^' operator, not a 'pow' function"
+        "pow() maps to OL's '^' operator, not a 'pow' function",
       )
     )
       passed++;
@@ -293,7 +293,7 @@ async function runTests() {
       assertEqual(
         await vega2ol("atan(datum.value)"),
         ["atan", ["get", "value"]],
-        "atan() single-arg form"
+        "atan() single-arg form",
       )
     )
       passed++;
@@ -303,7 +303,7 @@ async function runTests() {
       assertEqual(
         await vega2ol("atan2(datum.x, datum.y)"),
         ["atan", ["get", "x"], ["get", "y"]],
-        "atan2() two-arg form"
+        "atan2() two-arg form",
       )
     )
       passed++;
@@ -313,7 +313,7 @@ async function runTests() {
       assertEqual(
         await vega2ol("clamp(datum.value, 0, 100)"),
         ["clamp", ["get", "value"], 0, 100],
-        "clamp() preserves (value, min, max) arg order"
+        "clamp() preserves (value, min, max) arg order",
       )
     )
       passed++;
@@ -323,7 +323,7 @@ async function runTests() {
       assertEqual(
         await vega2ol("rgb(255, 0, 0)"),
         ["color", 255, 0, 0, 1],
-        "rgb() with 3 numeric literals, default opacity"
+        "rgb() with 3 numeric literals, default opacity",
       )
     )
       passed++;
@@ -333,7 +333,7 @@ async function runTests() {
       assertEqual(
         await vega2ol("rgb(255, 0, 0, 0.5)"),
         ["color", 255, 0, 0, 0.5],
-        "rgb() with explicit opacity"
+        "rgb() with explicit opacity",
       )
     )
       passed++;
@@ -343,7 +343,7 @@ async function runTests() {
       assertEqual(
         await vega2ol("rgb(datum.r, datum.g, datum.b)"),
         ["color", ["get", "r"], ["get", "g"], ["get", "b"], 1],
-        "rgb() with dynamic field args, default opacity"
+        "rgb() with dynamic field args, default opacity",
       )
     )
       passed++;
@@ -353,7 +353,7 @@ async function runTests() {
       assertEqual(
         await vega2ol("rgb(sqrt(50), 0, 0, 0.5)"),
         ["color", ["sqrt", 50], 0, 0, 0.5],
-        "rgb() with nested function call as a channel arg"
+        "rgb() with nested function call as a channel arg",
       )
     )
       passed++;
@@ -364,7 +364,7 @@ async function runTests() {
     if (
       assertEqual(
         await vega2ol(
-          "datum.population > 1000000 ? '#FF0000' : datum.population > 500000 ? '#FFA500' : '#FFFF00'"
+          "datum.population > 1000000 ? '#FF0000' : datum.population > 500000 ? '#FFA500' : '#FFFF00'",
         ),
         [
           "case",
@@ -372,7 +372,7 @@ async function runTests() {
           "#FF0000",
           ["case", [">", ["get", "population"], 500000], "#FFA500", "#FFFF00"],
         ],
-        "Color mapping by population size"
+        "Color mapping by population size",
       )
     )
       passed++;
@@ -398,7 +398,7 @@ async function runTests() {
       assertEqual(
         await vega2ol("indexof(['USA', 'India'], datum.country) != -1"),
         ["in", ["get", "country"], ["literal", ["USA", "India"]]],
-        "indexOf with != -1 (is in)"
+        "indexOf with != -1 (is in)",
       )
     )
       passed++;
@@ -408,7 +408,7 @@ async function runTests() {
       assertEqual(
         await vega2ol("-1 != indexof(['USA', 'India'], datum.country)"),
         ["in", ["get", "country"], ["literal", ["USA", "India"]]],
-        "reverse indexOf with != -1 (is in)"
+        "reverse indexOf with != -1 (is in)",
       )
     )
       passed++;
@@ -417,7 +417,7 @@ async function runTests() {
     if (
       assertEqual(
         await vega2ol(
-          "indexof(['hot', 'warm'], datum.temperature) != -1 ? 'red' : 'blue'"
+          "indexof(['hot', 'warm'], datum.temperature) != -1 ? 'red' : 'blue'",
         ),
         [
           "case",
@@ -425,7 +425,7 @@ async function runTests() {
           "red",
           "blue",
         ],
-        "indexOf in ternary (if in)"
+        "indexOf in ternary (if in)",
       )
     )
       passed++;
@@ -435,7 +435,7 @@ async function runTests() {
       assertEqual(
         await vega2ol("indexof(['USA', 'India'], datum.country) == -1"),
         ["!", ["in", ["get", "country"], ["literal", ["USA", "India"]]]],
-        "indexOf with == -1 (is not in)"
+        "indexOf with == -1 (is not in)",
       )
     )
       passed++;
@@ -445,7 +445,78 @@ async function runTests() {
       assertEqual(
         await vega2ol("-1 == indexof(['USA', 'India'], datum.country)"),
         ["!", ["in", ["get", "country"], ["literal", ["USA", "India"]]]],
-        "reverse indexOf with == -1 (is not in)"
+        "reverse indexOf with == -1 (is not in)",
+      )
+    )
+      passed++;
+    else failed++;
+
+    if (
+      assertEqual(
+        await vega2ol('"id-" + datum.name'),
+        ["concat", "id-", ["get", "name"]],
+        "string + property (concatenation)",
+      )
+    )
+      passed++;
+    else failed++;
+
+    if (
+      assertEqual(
+        await vega2ol('"prefix-" + datum.name + "-suffix"'),
+        ["concat", ["concat", "prefix-", ["get", "name"]], "-suffix"],
+        "multiple string concatenations",
+      )
+    )
+      passed++;
+    else failed++;
+
+    if (
+      assertEqual(
+        vega2ol('datum.name + "-middle-" + "-suffix"'),
+        ["concat", ["concat", ["get", "name"], "-middle-"], "-suffix"],
+        "string concatenation while property is in start",
+      )
+    )
+      passed++;
+    else failed++;
+
+    if (
+      assertEqual(
+        vega2ol('"prefix-" + "-middle-" + datum.name'),
+        ["concat", ["concat", "prefix-", "-middle-"], ["get", "name"]],
+        "string concatenation while property is in last",
+      )
+    )
+      passed++;
+    else failed++;
+
+    if (
+      assertEqual(
+        await vega2ol('datum.name + "-id"'),
+        ["concat", ["get", "name"], "-id"],
+        "property + string (concatenation)",
+      )
+    )
+      passed++;
+    else failed++;
+
+    // Numeric addition should remain unchanged
+    if (
+      assertEqual(
+        await vega2ol("10 + 20 + 30"),
+        ["+", ["+", 10, 20], 30],
+        "multiple numeric addition",
+      )
+    )
+      passed++;
+    else failed++;
+
+    if (
+      assertEqual(
+        await vega2ol("datum.value + 10"),
+        ["+", ["get", "value"], 10],
+        "property + number (numeric addition)",
       )
     )
       passed++;
@@ -458,7 +529,7 @@ async function runTests() {
       await assertThrows(
         "upper(datum.name)",
         "upper() throws (no OL string case operator)",
-        "Unsupported function"
+        "Unsupported function",
       )
     )
       passed++;
@@ -468,7 +539,7 @@ async function runTests() {
       await assertThrows(
         "lower(datum.name)",
         "lower() throws (no OL string case operator)",
-        "Unsupported function"
+        "Unsupported function",
       )
     )
       passed++;
@@ -478,7 +549,7 @@ async function runTests() {
       await assertThrows(
         "toString(datum.value)",
         "toString() throws (no OL type coercion operator)",
-        "Unsupported function"
+        "Unsupported function",
       )
     )
       passed++;
@@ -488,7 +559,7 @@ async function runTests() {
       await assertThrows(
         "isValid(datum.value)",
         "isValid() throws (no OL type-checking operator)",
-        "Unsupported function"
+        "Unsupported function",
       )
     )
       passed++;
@@ -498,7 +569,7 @@ async function runTests() {
       await assertThrows(
         "length(datum.items)",
         "length() throws (no OL length operator)",
-        "Unsupported function"
+        "Unsupported function",
       )
     )
       passed++;
@@ -508,7 +579,7 @@ async function runTests() {
       await assertThrows(
         "format(datum.value, ',.2f')",
         "format() throws (no OL number-formatting operator)",
-        "Unsupported function"
+        "Unsupported function",
       )
     )
       passed++;
@@ -518,7 +589,7 @@ async function runTests() {
       await assertThrows(
         "now()",
         "now() throws (no OL date/time operators)",
-        "Unsupported function"
+        "Unsupported function",
       )
     )
       passed++;
@@ -528,7 +599,7 @@ async function runTests() {
       await assertThrows(
         "min(datum.a, datum.b)",
         "min() throws (no OL aggregate min/max operator)",
-        "Unsupported function"
+        "Unsupported function",
       )
     )
       passed++;
@@ -538,7 +609,7 @@ async function runTests() {
       await assertThrows(
         "tan(datum.value)",
         "tan() throws (OL only supports sin/cos/atan)",
-        "Unsupported function"
+        "Unsupported function",
       )
     )
       passed++;
@@ -548,7 +619,7 @@ async function runTests() {
       await assertThrows(
         "indexof(datum.items, 'x')",
         "bare indexof() outside the != -1 / == -1 pattern throws a specific error",
-        "indexof is only supported in the pattern"
+        "indexof is only supported in the pattern",
       )
     )
       passed++;
@@ -560,7 +631,7 @@ async function runTests() {
       await assertThrows(
         "totallyMadeUpFunction(datum.value)",
         "Nonexistent function name throws",
-        "Unsupported function"
+        "Unsupported function",
       )
     )
       passed++;
@@ -570,7 +641,7 @@ async function runTests() {
       await assertThrows(
         "fooBarBaz(1, 2, 3)",
         "Another nonexistent function name throws",
-        "Unsupported function"
+        "Unsupported function",
       )
     )
       passed++;
@@ -588,6 +659,21 @@ async function runTests() {
         passed++;
       } else {
         console.log("❌ Wrong error type");
+        failed++;
+      }
+    }
+
+    // Null literal
+    try {
+      await vega2ol("null");
+      console.log("❌ Should throw for null literal");
+      failed++;
+    } catch (error) {
+      if (error instanceof Vega2OLError) {
+        console.log("   ✅ Throws Vega2OLError for null literal");
+        passed++;
+      } else {
+        console.log("❌ Wrong error type for null literal");
         failed++;
       }
     }
