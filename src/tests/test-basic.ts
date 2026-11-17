@@ -463,9 +463,29 @@ async function runTests() {
 
     if (
       assertEqual(
-        await vega2ol('"id-" + datum.name + "-suffix"'),
-        ["concat", ["concat", "id-", ["get", "name"]], "-suffix"],
+        await vega2ol('"prefix-" + datum.name + "-suffix"'),
+        ["concat", ["concat", "prefix-", ["get", "name"]], "-suffix"],
         "multiple string concatenations",
+      )
+    )
+      passed++;
+    else failed++;
+
+    if (
+      assertEqual(
+        vega2ol('datum.name + "-middle-" + "-suffix"'),
+        ["concat", ["concat", ["get", "name"], "-middle-"], "-suffix"],
+        "string concatenation while property is in start",
+      )
+    )
+      passed++;
+    else failed++;
+
+    if (
+      assertEqual(
+        vega2ol('"prefix-" + "-middle-" + datum.name'),
+        ["concat", ["concat", "prefix-", "-middle-"], ["get", "name"]],
+        "string concatenation while property is in last",
       )
     )
       passed++;

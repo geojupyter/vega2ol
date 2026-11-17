@@ -109,6 +109,21 @@ class VegaToOLVisitor {
     return false;
   }
 
+  private isStringExpression(node: VegaNode): boolean {
+    if (node.type === "Literal" && typeof node.value === "string") {
+      return true;
+    }
+
+    if (node.type === "BinaryExpression" && node.operator === "+") {
+      return (
+        this.isStringExpression(node.left) ||
+        this.isStringExpression(node.right)
+      );
+    }
+
+    return false;
+  }
+
   visit(node: VegaNode): ExpressionValue {
     if (!node || !node.type) {
       throw new Vega2OLError("Invalid AST node");
@@ -212,7 +227,7 @@ class VegaToOLVisitor {
     // String Concatination: a + b where either a or b is a string
     if (
       operator === "+" &&
-      (typeof leftOL === "string" || typeof rightOL === "string")
+      (this.isStringExpression(left) || this.isStringExpression(right))
     ) {
       return ["concat", leftOL, rightOL];
     }
